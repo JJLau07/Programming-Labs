@@ -18,6 +18,7 @@ int main()
     std::cout << "  3. Help" << std::endl;
     std::cout << "  4. Exit" << std::endl;
     std::cout << "=======================" << std::endl;
+    std::cout << std::endl;
     std::cout << "Enter Your Choice: ";
     std::cin >> choice;
     std::cout << std::endl;
@@ -40,6 +41,8 @@ int main()
     }
     std::cout << std::endl;
     std::cout << " Thank you for using the program " << name << "!" << std::endl;
+    std::cout << std::endl;
+    std::cout << std::endl;
 
     return 0;
 }
