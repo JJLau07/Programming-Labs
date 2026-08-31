@@ -1,0 +1,175 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+// Failed Login Analysis Program
+int main()
+{
+    int selectMainMenu{};
+    do
+    {
+        std::cout << "\n====== Failed Login Analysis System ======\n"
+                  << "1. Analyze Login Attempts\n"
+                  << "2. Exit\n"
+                  << "\nSelect option: ";
+        std::cin >> selectMainMenu;
+
+        if(selectMainMenu == 1)
+        {
+            //Clear Terminal
+            #ifdef _WIN32
+                std::system("cls");
+            #else
+                std::system("clear");
+            #endif
+
+            int attemptCount{};
+            int successfulCount{};
+            int wrongPasswordCount{};
+            int unknownUsernameCount{};
+            int lockedAccountCount{};
+
+            std::cout << "\nLogin Attempts to be Analyzed: ";
+            std::cin >> attemptCount;
+
+            if (attemptCount <= 0)
+            {
+                std::cout << "\nInvalid Input. Try Again.\n";
+                continue;
+            }
+
+            std::cout << "\nScale: 1-Successful 2-Wrong Password 3-Unknown Username 4-Locked Account\n";
+
+            for (int attempt = 1; attempt <= attemptCount; attempt++)
+            {   
+                int resultCount{};
+                std::cout << "Login Attempt " << attempt << ": ";
+                std::cin >> resultCount;
+
+                if (resultCount == 1)
+                {
+                    successfulCount++;
+                }
+                else if (resultCount == 2)
+                {
+                    wrongPasswordCount++;
+                }
+                else if (resultCount == 3)
+                {
+                    unknownUsernameCount++;
+                }
+                else if (resultCount == 4)
+                {
+                    lockedAccountCount++;
+                }
+                else
+                {
+                    std::cout << "\nInvalid Input. Try Again.\n";
+                    attempt--;
+                }
+            }
+
+            #ifdef _WIN32
+                std::system("cls");
+            #else
+                std::system("clear");
+            #endif
+
+            std::cout << "\n============ Results ============\n";
+            std::cout << "Total Login Attempts: " << attemptCount << '\n';
+            std::cout << "Successful Logins: " << successfulCount << '\n';
+            std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
+            std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
+            std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
+
+            double successPercent = successfulCount * 100.0 / attemptCount;
+            double failurePercent = (wrongPasswordCount + unknownUsernameCount + lockedAccountCount) * 100.0 / attemptCount;
+            std::cout << "\n=========== Percentage ==========\n";
+            std::cout << "Success Percentage: " << successPercent << "%\n";
+            std::cout << "Failure Percentage: " << failurePercent << "%\n";
+            
+            // Finding highest Count
+            int maxCount = wrongPasswordCount;
+            if (unknownUsernameCount > maxCount) maxCount = unknownUsernameCount;
+            if (lockedAccountCount > maxCount) maxCount = lockedAccountCount;
+
+            std::string commonFailure{};
+            if (maxCount == 0)
+            {
+                commonFailure = "None";
+            }
+            else
+            {
+                //Determining Ties
+                int ties = 0;
+                if (wrongPasswordCount == maxCount) ties++;
+                if (unknownUsernameCount == maxCount) ties++;
+                if (lockedAccountCount == maxCount) ties++;
+
+                if (ties > 1)
+                {
+                    commonFailure = "Tie";
+                }
+                else if (wrongPasswordCount == maxCount)
+                {
+                    commonFailure = "Wrong Password";
+                }
+                else if (unknownUsernameCount == maxCount)
+                {
+                    commonFailure = "Unknown Username";
+                }
+                else if (lockedAccountCount == maxCount)
+                {
+                    commonFailure = "Locked Account";
+                }
+            }
+            std::cout << "\nMost Common Failure: " << commonFailure << '\n';
+
+            std::string securityStatus{};
+            if (failurePercent == 0.0)
+            {
+                securityStatus = "Normal";
+            }
+            else if (failurePercent < 50.0)
+            {
+                securityStatus = "Warning";
+            }
+            else
+            {
+                securityStatus = "High Risk";
+            }
+            std::cout << "Security Status: " << securityStatus << '\n';
+
+            std::string temporaryBlock{};
+            if (lockedAccountCount >= 3 || failurePercent >= 75.0)
+            {
+                temporaryBlock = "Yes";
+            }
+            else
+            {
+                temporaryBlock = "No";
+            }
+            std::cout << "Temporary Block: " << temporaryBlock << '\n';
+            std::cout << "\n";
+            std::cout << "Returning to Menu...\n";
+        }
+        else if (selectMainMenu == 2)
+        {
+            //Clear Terminal
+            #ifdef _WIN32
+                std::system("cls");
+            #else
+                std::system("clear");
+            #endif
+
+            std::cout << "\nExited Successfully.\n";
+        }
+        else
+        {
+            std::cout << "\nInvalid Input. Try Again.\n";
+        }
+
+    } while (selectMainMenu != 2);
+
+    return 0;
+}
