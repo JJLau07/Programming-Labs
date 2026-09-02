@@ -12,15 +12,10 @@ void clearTerminal()
     #endif
 }
 
-void calculatePercentages(int attemptCount, int successfulCount,
-               int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
-               double& successPercent, double& failurePercent)
+double calculatePercentage (int count, int total)
 {
-    if (attemptCount > 0)
-    {
-        successPercent = successfulCount * 100.0 / attemptCount;
-        failurePercent = (wrongPasswordCount + unknownUsernameCount + lockedAccountCount) * 100.0 / attemptCount;
-    }
+    if (total <= 0) return 0.0;
+    return (count * 100.0) / total;
 }
 
 std::string determineSecurityStatus (double failurePercent)
@@ -109,10 +104,10 @@ int main()
             std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
             std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
             
-            double successPercent{};
-            double failurePercent{};
+            int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
 
-            calculatePercentages(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent);
+            double successPercent = calculatePercentage (successfulCount, attemptCount);
+            double failurePercent = calculatePercentage (totalFailure, attemptCount);
 
             std::cout << "\n=========== Percentage ==========\n";
             std::cout << "Success Percentage: " << successPercent << "%\n";
