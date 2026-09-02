@@ -76,9 +76,16 @@ void processLoginAttempts(int attemptCount, int& successfulCount, int& wrongPass
     }
 }
 
-void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
-                            double successPercent, double failurePercent, const std::string& commonFailure, const std::string& securityStatus, const std::string& temporaryBlock)
+void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
 {
+    int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
+    double successPercent = calculatePercentage(successfulCount, attemptCount);
+    double failurePercent = calculatePercentage(totalFailure, attemptCount);
+
+    std::string commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    std::string securityStatus = determineSecurityStatus(failurePercent);
+    std::string temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
+
     std::cout << "\n============ Results ============\n";
     std::cout << "Total Login Attempts: " << attemptCount << '\n';
     std::cout << "Successful Logins: " << successfulCount << '\n';
@@ -125,27 +132,13 @@ int main()
                 continue;
             }
 
+            // Login Attempt Count
             processLoginAttempts(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
 
             clearTerminal();
 
-            // Percentage
-            int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
-            double successPercent = calculatePercentage(successfulCount, attemptCount);
-            double failurePercent = calculatePercentage(totalFailure, attemptCount);
-
-            // Common Failure
-            std::string commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
-
-            // Security Status
-            std::string securityStatus = determineSecurityStatus(failurePercent);
-
-            // Temporary Block
-            std::string temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
-
             // Print Analysis Result
-            displayAnalysisResult(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount,
-                                  successPercent, failurePercent, commonFailure, securityStatus, temporaryBlock);
+            displayAnalysisResult(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
 
             // Return Menu Message
             std::cout << "\n";
