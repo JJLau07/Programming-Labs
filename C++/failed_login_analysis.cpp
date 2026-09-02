@@ -20,31 +20,15 @@ double calculatePercentage(int count, int total)
 
 std::string determineSecurityStatus(double failurePercent)
 {
-    if (failurePercent == 0.0)
-    {
-        return "Normal";
-    }
-    else if (failurePercent < 50.0)
-    {
-        return "Warning";
-    }
-    else
-    {
-        return "High Risk";
-    }
+    if (failurePercent == 0.0) return "Normal";
+    else if (failurePercent < 50.0) return "Warning";
+    else return "High Risk";
 }
 
-std::string temporaryBlockLogic(double failurePercent, int lockedAccountCount)
+std::string temporaryBlockDecision(double failurePercent, int lockedAccountCount)
 {
-    if (lockedAccountCount >= 3 || failurePercent >= 75.0)
-    {
-        return "Yes";
-    }
-    else
-    {
-        return "No";
-    }
-
+    if (lockedAccountCount >= 3 || failurePercent >= 75.0) return "Yes";
+    else return "No";
 }
 
 std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
@@ -55,10 +39,7 @@ std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCo
     if (lockedAccountCount > maxCount) maxCount = lockedAccountCount;
 
     // 0 failure
-    if (maxCount == 0)
-    {
-        return "None";
-    }
+    if (maxCount == 0) return "None";
 
     // Count ties
     int ties = 0;
@@ -67,22 +48,51 @@ std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCo
     if (lockedAccountCount == maxCount) ties++;
 
     // Result
-    if (ties > 1)
-    {
-        return "Tie";
+    if (ties > 1) return "Tie";
+    else if (wrongPasswordCount == maxCount) return "Wrong Password";
+    else if (unknownUsernameCount == maxCount) return "Unknown Username";
+    else return "Locked Account";
+}
+
+void processLoginAttempts(int attemptCount, int& successfulCount, int& wrongPasswordCount,
+                          int& unknownUsernameCount, int& lockedAccountCount)
+{
+    std::cout << "\nScale: 1-Successful 2-Wrong Password 3-Unknown Username 4-Locked Account\n";
+    for (int attempt = 1; attempt <= attemptCount; attempt++)
+    {   
+        int resultCount{};
+        std::cout << "Login Attempt " << attempt << ": ";
+        std::cin >> resultCount;
+
+        if (resultCount == 1) successfulCount++;
+        else if (resultCount == 2) wrongPasswordCount++;
+        else if (resultCount == 3) unknownUsernameCount++;
+        else if (resultCount == 4) lockedAccountCount++;
+        else
+        {
+            std::cout << "\nInvalid Input. Try Again.\n";
+            attempt--;
+        }
     }
-    else if (wrongPasswordCount == maxCount)
-    {
-        return "Wrong Password";
-    }
-    else if (unknownUsernameCount == maxCount)
-    {
-        return "Unknown Username";
-    }
-    else
-    {
-        return "Locked Account";
-    }
+}
+
+void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
+                            double successPercent, double failurePercent, const std::string& commonFailure, const std::string& securityStatus, const std::string& temporaryBlock)
+{
+    std::cout << "\n============ Results ============\n";
+    std::cout << "Total Login Attempts: " << attemptCount << '\n';
+    std::cout << "Successful Logins: " << successfulCount << '\n';
+    std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
+    std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
+    std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
+
+    std::cout << "\n=========== Percentage ==========\n";
+    std::cout << "Success Percentage: " << successPercent << "%\n";
+    std::cout << "Failure Percentage: " << failurePercent << "%\n";
+
+    std::cout << "\nMost Common Failure: " << commonFailure << '\n';
+    std::cout << "Security Status: " << securityStatus << '\n';
+    std::cout << "Temporary Block: " << temporaryBlock << '\n';
 }
 
 int main()
@@ -115,36 +125,7 @@ int main()
                 continue;
             }
 
-            std::cout << "\nScale: 1-Successful 2-Wrong Password 3-Unknown Username 4-Locked Account\n";
-
-            for (int attempt = 1; attempt <= attemptCount; attempt++)
-            {   
-                int resultCount{};
-                std::cout << "Login Attempt " << attempt << ": ";
-                std::cin >> resultCount;
-
-                if (resultCount == 1)
-                {
-                    successfulCount++;
-                }
-                else if (resultCount == 2)
-                {
-                    wrongPasswordCount++;
-                }
-                else if (resultCount == 3)
-                {
-                    unknownUsernameCount++;
-                }
-                else if (resultCount == 4)
-                {
-                    lockedAccountCount++;
-                }
-                else
-                {
-                    std::cout << "\nInvalid Input. Try Again.\n";
-                    attempt--;
-                }
-            }
+            processLoginAttempts(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
 
             clearTerminal();
 
@@ -160,24 +141,13 @@ int main()
             std::string securityStatus = determineSecurityStatus(failurePercent);
 
             // Temporary Block
-            std::string temporaryBlock = temporaryBlockLogic(failurePercent, lockedAccountCount);
+            std::string temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
 
-            // Summary (Print Result)
-            std::cout << "\n============ Results ============\n";
-            std::cout << "Total Login Attempts: " << attemptCount << '\n';
-            std::cout << "Successful Logins: " << successfulCount << '\n';
-            std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
-            std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
-            std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
+            // Print Analysis Result
+            displayAnalysisResult(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount,
+                                  successPercent, failurePercent, commonFailure, securityStatus, temporaryBlock);
 
-            std::cout << "\n=========== Percentage ==========\n";
-            std::cout << "Success Percentage: " << successPercent << "%\n";
-            std::cout << "Failure Percentage: " << failurePercent << "%\n";
-
-            std::cout << "\nMost Common Failure: " << commonFailure << '\n';
-            std::cout << "Security Status: " << securityStatus << '\n';
-            std::cout << "Temporary Block: " << temporaryBlock << '\n';
-
+            // Return Menu Message
             std::cout << "\n";
             std::cout << "Returning to Menu...\n";
         }
