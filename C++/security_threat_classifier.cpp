@@ -2,6 +2,75 @@
 #include <string>
 #include <cstdlib>
 
+void clearTerminal()
+{
+    // clear terminal
+    #ifdef _WIN32
+        std::system("cls");
+    #else
+        std::system("clear");
+    #endif
+}
+
+struct resultVariables
+{
+    int threatNormalCount{};
+    int threatSuspiciousCount{};
+    int threatMaliciousCount{};
+    int threatLowCount{};
+    int threatMediumCount{};
+    int threatHighCount{};
+    int threatCriticalCount{};
+
+    double normalPercent{};
+    double suspiciousPercent{};
+    double maliciousPercent{};
+    double highCriticalPercent{};
+    
+    std::string commonThreat{};
+    std::string commonSeverity{};
+    std::string threatLevel{};
+    std::string actionRequired{};
+    std::string emergencyResponse{};
+    std::string systemAction{};
+
+
+};
+
+void printResult(const resultVariables& res)
+{   
+    std::cout << "\n============ Results ============\n";
+
+    std::cout << "\nThreat Categories\n";
+    std::cout << "  Total Normal Threats     : " << res.threatNormalCount << '\n';
+    std::cout << "  Total Suspicious Threats : " << res.threatSuspiciousCount << '\n';
+    std::cout << "  Total Malicious Threats  : " << res.threatMaliciousCount << '\n';
+
+    std::cout << "\nSeverity Levels\n";
+    std::cout << "  Total Low Severity       : " << res.threatLowCount << '\n';
+    std::cout << "  Total Medium Severity    : " << res.threatMediumCount << '\n';
+    std::cout << "  Total High Severity      : " << res.threatHighCount << '\n';
+    std::cout << "  Total Critical Severity  : " << res.threatCriticalCount << '\n';
+
+    std::cout << "\nPercentages\n";
+    std::cout << "  Normal          : " << res.normalPercent << "%\n";
+    std::cout << "  Suspicious      : " << res.suspiciousPercent << "%\n";
+    std::cout << "  Malicious       : " << res.maliciousPercent << "%\n";
+    std::cout << "  High & Critical : " << res.highCriticalPercent << "%\n";
+
+    std::cout << "\nMost Common Threat   : " << res.commonThreat << '\n';
+    std::cout << "Most Common Severity : " << res.commonSeverity << '\n';
+    std::cout << "Threat Level         : " << res.threatLevel << '\n';
+    std::cout << "\n";
+    std::cout << res.actionRequired;
+    std::cout << "Emergency Response   : " << res.emergencyResponse << '\n';
+    std::cout << "System Action        : " << res.systemAction << '\n';
+    
+    std::cout << "\n=================================\n";
+    std::cout << "\nReturning to Menu...\n";
+    std::cout << " \n";
+}
+
 // Security Threat Classifier Program
 int main()
 {   
@@ -17,12 +86,10 @@ int main()
 
         if (selectMainMenu == 1)
         {   
-            // clear terminal
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            resultVariables result;
+
+            // Clear Terminal
+            clearTerminal();
 
             // Event Count Section
             int eventCount{};
@@ -35,14 +102,6 @@ int main()
             }
 
             // Threat Count Section
-            int threatNormalCount{};
-            int threatSuspiciousCount{};
-            int threatMaliciousCount{};
-            int threatLowCount{};
-            int threatMediumCount{};
-            int threatHighCount{};
-            int threatCriticalCount{};
-
             std::cout << "\nCategory: 1-Normal 2-Suspicious 3-Malicious\n";
             std::cout << "Severity Level: 1-Low 2-Medium 3-High 4-Critical\n";
             
@@ -78,146 +137,96 @@ int main()
                 }
 
                 // Category Count
-                if (threatCategoryCount == 1) threatNormalCount++;
-                else if (threatCategoryCount == 2) threatSuspiciousCount++;
-                else if (threatCategoryCount == 3) threatMaliciousCount++;
+                if (threatCategoryCount == 1) result.threatNormalCount++;
+                else if (threatCategoryCount == 2) result.threatSuspiciousCount++;
+                else if (threatCategoryCount == 3) result.threatMaliciousCount++;
 
                 // Severity Count
-                if (threatSeverityCount == 1) threatLowCount++;
-                else if (threatSeverityCount == 2) threatMediumCount++;
-                else if (threatSeverityCount == 3) threatHighCount++;
-                else if (threatSeverityCount == 4) threatCriticalCount++;
+                if (threatSeverityCount == 1) result.threatLowCount++;
+                else if (threatSeverityCount == 2) result.threatMediumCount++;
+                else if (threatSeverityCount == 3) result.threatHighCount++;
+                else if (threatSeverityCount == 4) result.threatCriticalCount++;
             }
 
-            // Summary Section
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
 
-            double normalPercent = threatNormalCount * 100.0 / eventCount;
-            double suspiciousPercent = threatSuspiciousCount * 100.0 / eventCount;
-            double maliciousPercent = threatMaliciousCount * 100.0 / eventCount;
-            double highCriticalPercent = (threatHighCount + threatCriticalCount) * 100.0 / eventCount;
-            
-            std::string commonThreat{};
-            std::string commonSeverity{};
-            std::string threatLevel{};
-            std::string actionRequired{};
-            std::string emergencyResponse{};
-            std::string systemAction{};
+            result.normalPercent = result.threatNormalCount * 100.0 / eventCount;
+            result.suspiciousPercent = result.threatSuspiciousCount * 100.0 / eventCount;
+            result.maliciousPercent = result.threatMaliciousCount * 100.0 / eventCount;
+            result.highCriticalPercent = (result.threatHighCount + result.threatCriticalCount) * 100.0 / eventCount;
 
             // Common Threat
-            int maxThreatCount = threatNormalCount;
-            if (threatSuspiciousCount > maxThreatCount) maxThreatCount = threatSuspiciousCount;
-            if (threatMaliciousCount > maxThreatCount) maxThreatCount = threatMaliciousCount;
+            int maxThreatCount = result.threatNormalCount;
+            if (result.threatSuspiciousCount > maxThreatCount) maxThreatCount = result.threatSuspiciousCount;
+            if (result.threatMaliciousCount > maxThreatCount) maxThreatCount = result.threatMaliciousCount;
 
             int threatTies = 0;
-            if (threatNormalCount == maxThreatCount) threatTies++;
-            if (threatSuspiciousCount == maxThreatCount) threatTies++;
-            if (threatMaliciousCount == maxThreatCount) threatTies++;
+            if (result.threatNormalCount == maxThreatCount) threatTies++;
+            if (result.threatSuspiciousCount == maxThreatCount) threatTies++;
+            if (result.threatMaliciousCount == maxThreatCount) threatTies++;
            
-            if (threatTies > 1) commonThreat = "Tie";
-            else if (threatNormalCount == maxThreatCount) commonThreat = "Normal";
-            else if (threatSuspiciousCount == maxThreatCount) commonThreat = "Suspicious";
-            else if (threatMaliciousCount == maxThreatCount) commonThreat = "Malicious";
+            if (threatTies > 1) result.commonThreat = "Tie";
+            else if (result.threatNormalCount == maxThreatCount) result.commonThreat = "Normal";
+            else if (result.threatSuspiciousCount == maxThreatCount) result.commonThreat = "Suspicious";
+            else if (result.threatMaliciousCount == maxThreatCount) result.commonThreat = "Malicious";
 
             // Common Severity
-            int maxSeverityCount = threatLowCount;
-            if (threatMediumCount > maxSeverityCount) maxSeverityCount = threatMediumCount;
-            if (threatHighCount > maxSeverityCount) maxSeverityCount = threatHighCount;
-            if (threatCriticalCount > maxSeverityCount) maxSeverityCount = threatCriticalCount;
+            int maxSeverityCount = result.threatLowCount;
+            if (result.threatMediumCount > maxSeverityCount) maxSeverityCount = result.threatMediumCount;
+            if (result.threatHighCount > maxSeverityCount) maxSeverityCount = result.threatHighCount;
+            if (result.threatCriticalCount > maxSeverityCount) maxSeverityCount = result.threatCriticalCount;
 
             int severityTies = 0;
-            if (threatLowCount == maxSeverityCount) severityTies++;
-            if (threatMediumCount == maxSeverityCount) severityTies++;
-            if (threatHighCount == maxSeverityCount) severityTies++;
-            if (threatCriticalCount == maxSeverityCount) severityTies++;
+            if (result.threatLowCount == maxSeverityCount) severityTies++;
+            if (result.threatMediumCount == maxSeverityCount) severityTies++;
+            if (result.threatHighCount == maxSeverityCount) severityTies++;
+            if (result.threatCriticalCount == maxSeverityCount) severityTies++;
 
-            if (severityTies > 1) commonSeverity = "Tie";
-            else if (threatLowCount == maxSeverityCount) commonSeverity = "Low";
-            else if (threatMediumCount == maxSeverityCount) commonSeverity = "Medium"; 
-            else if (threatHighCount == maxSeverityCount) commonSeverity = "High";
-            else if (threatCriticalCount == maxSeverityCount) commonSeverity = "Critical";
+            if (severityTies > 1) result.commonSeverity = "Tie";
+            else if (result.threatLowCount == maxSeverityCount) result.commonSeverity = "Low";
+            else if (result.threatMediumCount == maxSeverityCount) result.commonSeverity = "Medium"; 
+            else if (result.threatHighCount == maxSeverityCount) result.commonSeverity = "High";
+            else if (result.threatCriticalCount == maxSeverityCount) result.commonSeverity = "Critical";
 
             // Threat Level
-            if (maliciousPercent >= 50.0 || threatCriticalCount >= 3) threatLevel = "Critical";
-            else if (maliciousPercent > 0.0)
+            if (result.maliciousPercent >= 50.0 || result.threatCriticalCount >= 3) result.threatLevel = "Critical";
+            else if (result.maliciousPercent > 0.0)
             {
-                if (highCriticalPercent < 50.0)
+                if (result.highCriticalPercent < 50.0)
                 {
-                    threatLevel = "Medium";
+                    result.threatLevel = "Medium";
                 }
-                else if (highCriticalPercent >= 50.0)
+                else if (result.highCriticalPercent >= 50.0)
                 {
-                    threatLevel = "High";
+                    result.threatLevel = "High";
                 }
             }
-            else if (maliciousPercent == 0.0) threatLevel = "Low";
+            else if (result.maliciousPercent == 0.0) result.threatLevel = "Low";
 
             // Emergency Response
-            if (threatMaliciousCount >= 3 || threatCriticalCount >= 3 || maliciousPercent >= 75.0) emergencyResponse = "Required";
-            else emergencyResponse = "Not Required";
+            if (result.threatMaliciousCount >= 3 || result.threatCriticalCount >= 3 || result.maliciousPercent >= 75.0) result.emergencyResponse = "Required";
+            else result.emergencyResponse = "Not Required";
 
             // System Action
-            if (emergencyResponse == "Required") systemAction = "Isolate and Investigate";
-            else systemAction = "Continue Monitoring";
+            if (result.emergencyResponse == "Required") result.systemAction = "Isolate and Investigate";
+            else result.systemAction = "Continue Monitoring";
 
             // Action Required
-            if (emergencyResponse == "Required") actionRequired = "!!! Warning: Action Needed !!!\n";
+            if (result.emergencyResponse == "Required") result.actionRequired = "!!! Warning: Action Needed !!!\n";
 
-            // Results (Print)
-            std::cout << "\n============ Results ============\n";
-
-            std::cout << "\nThreat Categories\n";
-            std::cout << "  Total Normal Threats     : " << threatNormalCount << '\n';
-            std::cout << "  Total Suspicious Threats : " << threatSuspiciousCount << '\n';
-            std::cout << "  Total Malicious Threats  : " << threatMaliciousCount << '\n';
-
-            std::cout << "\nSeverity Levels\n";
-            std::cout << "  Total Low Severity       : " << threatLowCount << '\n';
-            std::cout << "  Total Medium Severity    : " << threatMediumCount << '\n';
-            std::cout << "  Total High Severity      : " << threatHighCount << '\n';
-            std::cout << "  Total Critical Severity  : " << threatCriticalCount << '\n';
-
-            std::cout << "\nPercentages\n";
-            std::cout << "  Normal          : " << normalPercent << "%\n";
-            std::cout << "  Suspicious      : " << suspiciousPercent << "%\n";
-            std::cout << "  Malicious       : " << maliciousPercent << "%\n";
-            std::cout << "  High & Critical : " << highCriticalPercent << "%\n";
-
-            std::cout << "\nMost Common Threat   : " << commonThreat << '\n';
-            std::cout << "Most Common Severity : " << commonSeverity << '\n';
-            std::cout << "Threat Level         : " << threatLevel << '\n';
-            std::cout << "\n";
-            std::cout << actionRequired;
-            std::cout << "Emergency Response   : " << emergencyResponse << '\n';
-            std::cout << "System Action        : " << systemAction << '\n';
-            
-            std::cout << "\n=================================\n";
-            std::cout << "\nReturning to Menu...\n";
-            std::cout << " \n";
+            printResult(result);
         }
         else if (selectMainMenu == 2)
         {
             // clear terminal
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
             // Exit Message
             std::cout << "\nExited Successfully.\n";
         }
         else 
         {
             // clear terminal
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
             // Invalid Message
             std::cout << "\nInvalid Input. Try Again.\n";
         }
