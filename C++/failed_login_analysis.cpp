@@ -47,6 +47,44 @@ std::string temporaryBlockLogic(double failurePercent, int lockedAccountCount)
 
 }
 
+std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+{
+    // Find the highest count
+    int maxCount = wrongPasswordCount;
+    if (unknownUsernameCount > maxCount) maxCount = unknownUsernameCount;
+    if (lockedAccountCount > maxCount) maxCount = lockedAccountCount;
+
+    // 0 failure
+    if (maxCount == 0)
+    {
+        return "None";
+    }
+
+    // Count ties
+    int ties = 0;
+    if (wrongPasswordCount == maxCount) ties++;
+    if (unknownUsernameCount == maxCount) ties++;
+    if (lockedAccountCount == maxCount) ties++;
+
+    // Result
+    if (ties > 1)
+    {
+        return "Tie";
+    }
+    else if (wrongPasswordCount == maxCount)
+    {
+        return "Wrong Password";
+    }
+    else if (unknownUsernameCount == maxCount)
+    {
+        return "Unknown Username";
+    }
+    else
+    {
+        return "Locked Account";
+    }
+}
+
 int main()
 {
     int selectMainMenu{};
@@ -110,64 +148,36 @@ int main()
 
             clearTerminal();
 
+            // Percentage
+            int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
+            double successPercent = calculatePercentage(successfulCount, attemptCount);
+            double failurePercent = calculatePercentage(totalFailure, attemptCount);
+
+            // Common Failure
+            std::string commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+
+            // Security Status
+            std::string securityStatus = determineSecurityStatus(failurePercent);
+
+            // Temporary Block
+            std::string temporaryBlock = temporaryBlockLogic(failurePercent, lockedAccountCount);
+
+            // Summary (Print Result)
             std::cout << "\n============ Results ============\n";
             std::cout << "Total Login Attempts: " << attemptCount << '\n';
             std::cout << "Successful Logins: " << successfulCount << '\n';
             std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
             std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
             std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
-            
-            int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
-
-            double successPercent = calculatePercentage(successfulCount, attemptCount);
-            double failurePercent = calculatePercentage(totalFailure, attemptCount);
 
             std::cout << "\n=========== Percentage ==========\n";
             std::cout << "Success Percentage: " << successPercent << "%\n";
             std::cout << "Failure Percentage: " << failurePercent << "%\n";
 
-            // Finding highest Count
-            int maxCount = wrongPasswordCount;
-            if (unknownUsernameCount > maxCount) maxCount = unknownUsernameCount;
-            if (lockedAccountCount > maxCount) maxCount = lockedAccountCount;
-
-            std::string commonFailure{};
-            if (maxCount == 0)
-            {
-                commonFailure = "None";
-            }
-            else
-            {
-                //Determining Ties
-                int ties = 0;
-                if (wrongPasswordCount == maxCount) ties++;
-                if (unknownUsernameCount == maxCount) ties++;
-                if (lockedAccountCount == maxCount) ties++;
-
-                if (ties > 1)
-                {
-                    commonFailure = "Tie";
-                }
-                else if (wrongPasswordCount == maxCount)
-                {
-                    commonFailure = "Wrong Password";
-                }
-                else if (unknownUsernameCount == maxCount)
-                {
-                    commonFailure = "Unknown Username";
-                }
-                else if (lockedAccountCount == maxCount)
-                {
-                    commonFailure = "Locked Account";
-                }
-            }
             std::cout << "\nMost Common Failure: " << commonFailure << '\n';
-
-            std::string securityStatus = determineSecurityStatus(failurePercent);
             std::cout << "Security Status: " << securityStatus << '\n';
-
-            std::string temporaryBlock = temporaryBlockLogic(failurePercent, lockedAccountCount);
             std::cout << "Temporary Block: " << temporaryBlock << '\n';
+
             std::cout << "\n";
             std::cout << "Returning to Menu...\n";
         }
