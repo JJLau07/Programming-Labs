@@ -8,6 +8,7 @@ void invalidInput();
 void exitSystem();
 // ---
 // ---
+void processLoginAttempts(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
 void analyzeLoginAttempts();
 void displayMainMenu(int& selectMainMenu);
 
@@ -54,6 +55,28 @@ void analyzeLoginAttempts()
     {
         invalidInput();
         return;
+    }
+    processLoginAttempts(loginCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+}
+
+void processLoginAttempts(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+{
+    std::cout << "\nAttempt Type: 1-Successful Login 2-Wrong Password 3-Unknown Username 4-Locked Account\n";
+    for (int attempt = 1; attempt <= loginCount; attempt++)
+    {
+        int attemptCount;
+        std::cout << "Login Attempt " << attempt << ": ";
+        std::cin >> attemptCount;
+
+        if (attemptCount == 1) successfulCount++;
+        else if (attemptCount == 2) wrongPasswordCount++;
+        else if (attemptCount == 3) unknownUsernameCount++;
+        else if (attemptCount == 4) lockedAccountCount++;
+        else
+        {
+            invalidInput();
+            attempt--;
+        }
     }
 }
 
