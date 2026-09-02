@@ -8,25 +8,18 @@ void invalidInput();
 void exitSystem();
 // ---
 // ---
-void displayMainMenu();
-void loginAttemptSystem();
+void displayMainMenu(int& selectMainMenu);
 
 // ============ Controller ============
 int main()
 {   
-    loginAttemptSystem();
-    return 0;
-}
-
-void loginAttemptSystem()
-{
     int selectMainMenu{};
     do
     {
         displayMainMenu(selectMainMenu);
         if (selectMainMenu == 1)
         {
-
+    
         }
         else if (selectMainMenu == 2)
         {
@@ -38,10 +31,11 @@ void loginAttemptSystem()
             invalidInput();
         }
     } while (selectMainMenu !=2);
-    
+
+    return 0;
 }
 
-void displayMainMenu(int selectMainMenu)
+void displayMainMenu(int& selectMainMenu)
 {
     std::cout << "\n============ Security Login Analyzer ============\n"
               << "1. Analyze Login Attempts\n"
