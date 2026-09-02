@@ -12,7 +12,7 @@ void clearTerminal()
     #endif
 }
 
-void calculatePercentage(int attemptCount, int successfulCount,
+void calculatePercentages(int attemptCount, int successfulCount,
                int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
                double& successPercent, double& failurePercent)
 {
@@ -23,19 +23,19 @@ void calculatePercentage(int attemptCount, int successfulCount,
     }
 }
 
-void determineSecurityStatus(double failurePercent, std::string& securityStatus)
+std::string determineSecurityStatus (double failurePercent)
 {
     if (failurePercent == 0.0)
     {
-        securityStatus = "Normal";
+        return "Normal";
     }
     else if (failurePercent < 50.0)
     {
-        securityStatus = "Warning";
+        return "Warning";
     }
     else
     {
-        securityStatus = "High Risk";
+        return "High Risk";
     }
 }
 
@@ -112,7 +112,7 @@ int main()
             double successPercent{};
             double failurePercent{};
 
-            calculatePercentage(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent);
+            calculatePercentages(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent);
 
             std::cout << "\n=========== Percentage ==========\n";
             std::cout << "Success Percentage: " << successPercent << "%\n";
@@ -155,8 +155,7 @@ int main()
             }
             std::cout << "\nMost Common Failure: " << commonFailure << '\n';
 
-            std::string securityStatus{};
-            determineSecurityStatus(failurePercent, securityStatus);
+            std::string securityStatus = determineSecurityStatus(failurePercent);
             std::cout << "Security Status: " << securityStatus << '\n';
 
             std::string temporaryBlock{};
