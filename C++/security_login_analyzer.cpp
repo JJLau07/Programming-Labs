@@ -8,6 +8,7 @@ void invalidInput();
 void exitSystem();
 // ---
 // ---
+void analyzeLoginAttempts();
 void displayMainMenu(int& selectMainMenu);
 
 // ============ Controller ============
@@ -19,7 +20,7 @@ int main()
         displayMainMenu(selectMainMenu);
         if (selectMainMenu == 1)
         {
-    
+            analyzeLoginAttempts();
         }
         else if (selectMainMenu == 2)
         {
@@ -44,16 +45,24 @@ void displayMainMenu(int& selectMainMenu)
     std::cin >> selectMainMenu;
 }
 
+void analyzeLoginAttempts()
+{
+    int loginCount;
+    std::cout << "\nLogin attempts to be analyzed: ";
+    std::cin >> loginCount;
+    if (loginCount <= 0)
+    {
+        invalidInput();
+        return;
+    }
+}
+
 // ============ Core Logic ============
 
 // ============ Utilities ============
-void clearTerminal()
+void exitSystem()
 {
-    #ifdef _WIN32
-        std::system("cls");
-    #else
-        std::system("clear");
-    #endif
+    std::cout << "\nExited Sucessfully.\n";
 }
 
 void invalidInput()
@@ -61,7 +70,11 @@ void invalidInput()
     std::cout << "\nInvalid Input. Try Again\n";
 }
 
-void exitSystem()
+void clearTerminal()
 {
-    std::cout << "\nExited Sucessfully.\n";
+    #ifdef _WIN32
+        std::system("cls");
+    #else
+        std::system("clear");
+    #endif
 }
