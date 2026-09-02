@@ -76,15 +76,25 @@ void processLoginAttempts(int attemptCount, int& successfulCount, int& wrongPass
     }
 }
 
-void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+void analyzeLoginAttempt(int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
+                         double& successPercent, double&failurePercent,
+                         std::string& commonFailure, std::string& securityStatus, std::string& temporaryBlock)
 {
     int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
-    double successPercent = calculatePercentage(successfulCount, attemptCount);
-    double failurePercent = calculatePercentage(totalFailure, attemptCount);
+    successPercent = calculatePercentage(successfulCount, attemptCount);
+    failurePercent = calculatePercentage(totalFailure, attemptCount);
 
-    std::string commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
-    std::string securityStatus = determineSecurityStatus(failurePercent);
-    std::string temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
+    commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    securityStatus = determineSecurityStatus(failurePercent);
+    temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
+}
+
+void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+{
+    double successPercent{}, failurePercent{};
+    std::string commonFailure{}, securityStatus{}, temporaryBlock{};
+
+    analyzeLoginAttempt(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent, commonFailure, securityStatus, temporaryBlock);
 
     std::cout << "\n============ Results ============\n";
     std::cout << "Total Login Attempts: " << attemptCount << '\n';
@@ -147,7 +157,6 @@ int main()
         else if (selectMainMenu == 2)
         {
             clearTerminal();
-
             std::cout << "\nExited Successfully.\n";
         }
         else
