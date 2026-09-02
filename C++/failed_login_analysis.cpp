@@ -33,21 +33,14 @@ std::string temporaryBlockDecision(double failurePercent, int lockedAccountCount
 
 std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
 {
-    // Find the highest count
     int maxCount = wrongPasswordCount;
     if (unknownUsernameCount > maxCount) maxCount = unknownUsernameCount;
     if (lockedAccountCount > maxCount) maxCount = lockedAccountCount;
-
-    // 0 failure
     if (maxCount == 0) return "None";
-
-    // Count ties
     int ties = 0;
     if (wrongPasswordCount == maxCount) ties++;
     if (unknownUsernameCount == maxCount) ties++;
     if (lockedAccountCount == maxCount) ties++;
-
-    // Result
     if (ties > 1) return "Tie";
     else if (wrongPasswordCount == maxCount) return "Wrong Password";
     else if (unknownUsernameCount == maxCount) return "Unknown Username";
@@ -63,7 +56,6 @@ void processLoginAttempts(int attemptCount, int& successfulCount, int& wrongPass
         int resultCount{};
         std::cout << "Login Attempt " << attempt << ": ";
         std::cin >> resultCount;
-
         if (resultCount == 1) successfulCount++;
         else if (resultCount == 2) wrongPasswordCount++;
         else if (resultCount == 3) unknownUsernameCount++;
@@ -83,7 +75,6 @@ void analyzeLoginAttempt(int attemptCount, int successfulCount, int wrongPasswor
     int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
     successPercent = calculatePercentage(successfulCount, attemptCount);
     failurePercent = calculatePercentage(totalFailure, attemptCount);
-
     commonFailure = determineCommonFailure(wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
     securityStatus = determineSecurityStatus(failurePercent);
     temporaryBlock = temporaryBlockDecision(failurePercent, lockedAccountCount);
@@ -93,23 +84,39 @@ void displayAnalysisResult (int attemptCount, int successfulCount, int wrongPass
 {
     double successPercent{}, failurePercent{};
     std::string commonFailure{}, securityStatus{}, temporaryBlock{};
-
     analyzeLoginAttempt(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent, commonFailure, securityStatus, temporaryBlock);
-
     std::cout << "\n============ Results ============\n";
     std::cout << "Total Login Attempts: " << attemptCount << '\n';
     std::cout << "Successful Logins: " << successfulCount << '\n';
     std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
     std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
     std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
-
     std::cout << "\n=========== Percentage ==========\n";
     std::cout << "Success Percentage: " << successPercent << "%\n";
     std::cout << "Failure Percentage: " << failurePercent << "%\n";
-
     std::cout << "\nMost Common Failure: " << commonFailure << '\n';
     std::cout << "Security Status: " << securityStatus << '\n';
     std::cout << "Temporary Block: " << temporaryBlock << '\n';
+}
+
+void runAnalysisSystem()
+{
+    clearTerminal();
+    int attemptCount{};
+    int successfulCount{};
+    int wrongPasswordCount{};
+    int unknownUsernameCount{};
+    int lockedAccountCount{};
+    std::cout << "\nLogin Attempts to be Analyzed: ";
+    std::cin >> attemptCount;
+    if (attemptCount <= 0)
+    {
+        std::cout << "\nInvalid Input. Try Again.\n";
+        return;
+    }
+    processLoginAttempts(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    clearTerminal();
+    displayAnalysisResult(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
 }
 
 int main()
@@ -125,32 +132,7 @@ int main()
 
         if(selectMainMenu == 1)
         {
-            clearTerminal();
-
-            int attemptCount{};
-            int successfulCount{};
-            int wrongPasswordCount{};
-            int unknownUsernameCount{};
-            int lockedAccountCount{};
-
-            std::cout << "\nLogin Attempts to be Analyzed: ";
-            std::cin >> attemptCount;
-
-            if (attemptCount <= 0)
-            {
-                std::cout << "\nInvalid Input. Try Again.\n";
-                continue;
-            }
-
-            // Login Attempt Count
-            processLoginAttempts(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
-
-            clearTerminal();
-
-            // Print Analysis Result
-            displayAnalysisResult(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
-
-            // Return Menu Message
+            runAnalysisSystem();
             std::cout << "\n";
             std::cout << "Returning to Menu...\n";
         }
