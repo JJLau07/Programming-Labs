@@ -3,6 +3,42 @@
 #include <cstdlib>
 
 // Failed Login Analysis Program
+void clearTerminal()
+{
+    #ifdef _WIN32
+        std::system("cls");
+    #else
+        std::system("clear");
+    #endif
+}
+
+void calculatePercentage(int attemptCount, int successfulCount,
+               int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
+               double& successPercent, double& failurePercent)
+{
+    if (attemptCount > 0)
+    {
+        successPercent = successfulCount * 100.0 / attemptCount;
+        failurePercent = (wrongPasswordCount + unknownUsernameCount + lockedAccountCount) * 100.0 / attemptCount;
+    }
+}
+
+void determineSecurityStatus(double failurePercent, std::string& securityStatus)
+{
+    if (failurePercent == 0.0)
+    {
+        securityStatus = "Normal";
+    }
+    else if (failurePercent < 50.0)
+    {
+        securityStatus = "Warning";
+    }
+    else
+    {
+        securityStatus = "High Risk";
+    }
+}
+
 int main()
 {
     int selectMainMenu{};
@@ -16,12 +52,7 @@ int main()
 
         if(selectMainMenu == 1)
         {
-            //Clear Terminal
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
 
             int attemptCount{};
             int successfulCount{};
@@ -69,11 +100,7 @@ int main()
                 }
             }
 
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
 
             std::cout << "\n============ Results ============\n";
             std::cout << "Total Login Attempts: " << attemptCount << '\n';
@@ -81,13 +108,16 @@ int main()
             std::cout << "Wrong Password Attempts: " << wrongPasswordCount << '\n';
             std::cout << "Unknown Username Attempts: " << unknownUsernameCount << '\n';
             std::cout << "Locked Account Attempts: " << lockedAccountCount << '\n';
+            
+            double successPercent{};
+            double failurePercent{};
 
-            double successPercent = successfulCount * 100.0 / attemptCount;
-            double failurePercent = (wrongPasswordCount + unknownUsernameCount + lockedAccountCount) * 100.0 / attemptCount;
+            calculatePercentage(attemptCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent);
+
             std::cout << "\n=========== Percentage ==========\n";
             std::cout << "Success Percentage: " << successPercent << "%\n";
             std::cout << "Failure Percentage: " << failurePercent << "%\n";
-            
+
             // Finding highest Count
             int maxCount = wrongPasswordCount;
             if (unknownUsernameCount > maxCount) maxCount = unknownUsernameCount;
@@ -126,18 +156,7 @@ int main()
             std::cout << "\nMost Common Failure: " << commonFailure << '\n';
 
             std::string securityStatus{};
-            if (failurePercent == 0.0)
-            {
-                securityStatus = "Normal";
-            }
-            else if (failurePercent < 50.0)
-            {
-                securityStatus = "Warning";
-            }
-            else
-            {
-                securityStatus = "High Risk";
-            }
+            determineSecurityStatus(failurePercent, securityStatus);
             std::cout << "Security Status: " << securityStatus << '\n';
 
             std::string temporaryBlock{};
@@ -155,17 +174,13 @@ int main()
         }
         else if (selectMainMenu == 2)
         {
-            //Clear Terminal
-            #ifdef _WIN32
-                std::system("cls");
-            #else
-                std::system("clear");
-            #endif
+            clearTerminal();
 
             std::cout << "\nExited Successfully.\n";
         }
         else
         {
+            clearTerminal();
             std::cout << "\nInvalid Input. Try Again.\n";
         }
 
