@@ -12,13 +12,13 @@ void clearTerminal()
     #endif
 }
 
-double calculatePercentage (int count, int total)
+double calculatePercentage(int count, int total)
 {
     if (total <= 0) return 0.0;
     return (count * 100.0) / total;
 }
 
-std::string determineSecurityStatus (double failurePercent)
+std::string determineSecurityStatus(double failurePercent)
 {
     if (failurePercent == 0.0)
     {
@@ -32,6 +32,19 @@ std::string determineSecurityStatus (double failurePercent)
     {
         return "High Risk";
     }
+}
+
+std::string temporaryBlockLogic(double failurePercent, int lockedAccountCount)
+{
+    if (lockedAccountCount >= 3 || failurePercent >= 75.0)
+    {
+        return "Yes";
+    }
+    else
+    {
+        return "No";
+    }
+
 }
 
 int main()
@@ -106,8 +119,8 @@ int main()
             
             int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
 
-            double successPercent = calculatePercentage (successfulCount, attemptCount);
-            double failurePercent = calculatePercentage (totalFailure, attemptCount);
+            double successPercent = calculatePercentage(successfulCount, attemptCount);
+            double failurePercent = calculatePercentage(totalFailure, attemptCount);
 
             std::cout << "\n=========== Percentage ==========\n";
             std::cout << "Success Percentage: " << successPercent << "%\n";
@@ -153,15 +166,7 @@ int main()
             std::string securityStatus = determineSecurityStatus(failurePercent);
             std::cout << "Security Status: " << securityStatus << '\n';
 
-            std::string temporaryBlock{};
-            if (lockedAccountCount >= 3 || failurePercent >= 75.0)
-            {
-                temporaryBlock = "Yes";
-            }
-            else
-            {
-                temporaryBlock = "No";
-            }
+            std::string temporaryBlock = temporaryBlockLogic(failurePercent, lockedAccountCount);
             std::cout << "Temporary Block: " << temporaryBlock << '\n';
             std::cout << "\n";
             std::cout << "Returning to Menu...\n";
