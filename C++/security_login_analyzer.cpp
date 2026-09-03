@@ -12,65 +12,187 @@ std::string determineTemporaryBlock(int lockedAccountCount, double failurePercen
 std::string determineSecurityStatus(double failurePercent);
 std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
 
-void analyzeLoginAttempt( int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount, double& successPercent, double& failurePercent, std::string& commonFailure, std::string& securityStatus, std::string& temporaryBlock);
-void displayAnalysisResult(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
+void storeAnalysisHistory(int& historyCount, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
+                     int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                     int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                     int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3);
+void runAnalysisHistory(int historyCount,
+                        int loginCount1, int wrongPasswordCount1, int unknownUsernameCount1, int lockedAccountCount1,
+                        int loginCount2, int wrongPasswordCount2, int unknownUsernameCount2, int lockedAccountCount2,
+                        int loginCount3, int wrongPasswordCount3, int unknownUsernameCount3, int lockedAccountCount3);
+void printSingleHistory(int analysisNum, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
+void printRecentAnalysis(int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
+void runAlertSummary(bool analyzedLoginAttempt, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
+void printAnalysisResult(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount);
 void processLoginAttempt(int loginCount, int& successfulCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount);
-void runLoginAttempt();
+void runLoginAttempt(bool& analyzedLoginAttempt, int& loginCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount,
+                     int& historyCount,
+                     int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                     int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                     int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3);
 void displayMainMenu(int& selectMainMenu);
+bool handleMainMenu(int selectMainMenu, bool& analyzedLoginAttempt, int& loginCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount,
+                    int& historyCount,
+                    int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                    int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                    int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3);
 
 // ============ Controllers ============
 int main()
 {
     int selectMainMenu{};
+    bool runLoop = true;
+    bool analyzedLoginAttempt = false;
+    int loginCount{};
+    int wrongPasswordCount{};
+    int unknownUsernameCount{};
+    int lockedAccountCount{};
+    int historyCount = 0;
+    int loginCount1 = 0, wrongPasswordCount1 = 0, unknownUsernameCount1 = 0, lockedAccountCount1 = 0;
+    int loginCount2 = 0, wrongPasswordCount2 = 0, unknownUsernameCount2 = 0, lockedAccountCount2 = 0;
+    int loginCount3 = 0, wrongPasswordCount3 = 0, unknownUsernameCount3 = 0, lockedAccountCount3 = 0;
+
     do
     {
         displayMainMenu(selectMainMenu);
+        runLoop = handleMainMenu(selectMainMenu, analyzedLoginAttempt, loginCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, historyCount,
+                                 loginCount1, wrongPasswordCount1, unknownUsernameCount1, lockedAccountCount1,
+                                 loginCount2, wrongPasswordCount2, unknownUsernameCount2, lockedAccountCount2,
+                                 loginCount3, wrongPasswordCount3, unknownUsernameCount3, lockedAccountCount3);
 
-        if (selectMainMenu == 1)
-        {   
-            runLoginAttempt();
-        }
-        else if (selectMainMenu == 2)
-        {
-            clearTerminal();
-            exitSystem();
-        }
-        else
-        {
-            clearTerminal();
-            invalidInput();
-        }
-    } while (selectMainMenu != 2);
+
+    } while (runLoop);
 
     return 0;
     
+}
+
+bool handleMainMenu(int selectMainMenu, bool& analyzedLoginAttempt, int& loginCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount,
+                    int& historyCount,
+                    int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                    int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                    int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3)
+{
+    clearTerminal();
+    if (selectMainMenu == 1) 
+    {
+        runLoginAttempt(analyzedLoginAttempt, loginCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount,
+                        historyCount,
+                        loginCount1, wrongPasswordCount1, unknownUsernameCount1, lockedAccountCount1,
+                        loginCount2, wrongPasswordCount2, unknownUsernameCount2, lockedAccountCount2,
+                        loginCount3, wrongPasswordCount3, unknownUsernameCount3, lockedAccountCount3);
+        return true;
+    }
+    else if (selectMainMenu == 2)
+    {
+        runAlertSummary(analyzedLoginAttempt, loginCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+        return true;
+    }
+    else if (selectMainMenu == 3)
+    {
+        runAnalysisHistory(historyCount,
+                           loginCount1, wrongPasswordCount1, unknownUsernameCount1, lockedAccountCount1,
+                           loginCount2, wrongPasswordCount2, unknownUsernameCount2, lockedAccountCount2,
+                           loginCount3, wrongPasswordCount3, unknownUsernameCount3, lockedAccountCount3);
+        return true;
+    }
+    else
+    {
+        if (selectMainMenu == 4)
+        {
+            exitSystem();
+            return false;
+        }
+        else
+        {
+            invalidInput();
+            return true;
+        }
+    }
 }
 
 void displayMainMenu(int& selectMainMenu)
 {
     std::cout << "\n============ Security Login Analyzer ============\n"
               << "1. Analyze Login Attempts\n"
-              << "2. Exit\n"
-              << "Select option: ";
+              << "2. Security Alert Summary\n"
+              << "3. Analysis History\n"
+              << "4. Exit\n"
+              << "\nSelect option: ";
     std::cin >> selectMainMenu;
 }
-
-void runLoginAttempt()
+bool inputLoginCount(int& loginCount)
 {
-    int loginCount;
     std::cout << "Login attempts to be analyzed: ";
     std::cin >> loginCount;
 
     if (loginCount <= 0)
     {
         invalidInput();
-        return;
+        return false;
+    }
+    return true;
+}
+
+void storeAnalysisHistory(int& historyCount, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount,
+                     int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                     int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                     int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3)
+{
+    if (historyCount == 0)
+    {
+        loginCount1 = loginCount;
+        wrongPasswordCount1 = wrongPasswordCount;
+        unknownUsernameCount1 = unknownUsernameCount;
+        lockedAccountCount1 = lockedAccountCount;
+        historyCount = 1;
+    }
+    else if (historyCount == 1)
+    {
+        loginCount2 = loginCount;
+        wrongPasswordCount2 = wrongPasswordCount;
+        unknownUsernameCount2 = unknownUsernameCount;
+        lockedAccountCount2 = lockedAccountCount;
+        historyCount = 2;
+    }
+    else if (historyCount == 2)
+    {
+        loginCount3 = loginCount;
+        wrongPasswordCount3 = wrongPasswordCount;
+        unknownUsernameCount3 = unknownUsernameCount;
+        lockedAccountCount3 = lockedAccountCount;
+        historyCount = 3;
+    }
+    else
+    {
+        loginCount1 = loginCount2; wrongPasswordCount1 = wrongPasswordCount2; unknownUsernameCount1 = unknownUsernameCount2; lockedAccountCount1 = lockedAccountCount2;
+        loginCount2 = loginCount3; wrongPasswordCount2 = wrongPasswordCount3; unknownUsernameCount2 = unknownUsernameCount3; lockedAccountCount2 = lockedAccountCount3;
+        loginCount3 = loginCount; wrongPasswordCount3 = wrongPasswordCount; unknownUsernameCount3 = unknownUsernameCount; lockedAccountCount3 = lockedAccountCount;
     }
 
-    int successfulCount{}, wrongPasswordCount{}, unknownUsernameCount{}, lockedAccountCount{};
+}
+
+void runLoginAttempt(bool& analyzedLoginAttempt, int& loginCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount,
+                     int& historyCount,
+                     int& loginCount1, int& wrongPasswordCount1, int& unknownUsernameCount1, int& lockedAccountCount1,
+                     int& loginCount2, int& wrongPasswordCount2, int& unknownUsernameCount2, int& lockedAccountCount2,
+                     int& loginCount3, int& wrongPasswordCount3, int& unknownUsernameCount3, int& lockedAccountCount3)
+{
+    int successfulCount{};
+    wrongPasswordCount = 0;
+    unknownUsernameCount = 0;
+    lockedAccountCount = 0;
+
+    if (!inputLoginCount(loginCount)) return;
     processLoginAttempt(loginCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
     clearTerminal();
-    displayAnalysisResult(loginCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    printAnalysisResult(loginCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    analyzedLoginAttempt = true;
+
+    storeAnalysisHistory(historyCount, loginCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount,
+                         loginCount1, wrongPasswordCount1, unknownUsernameCount1, lockedAccountCount1,
+                         loginCount2, wrongPasswordCount2, unknownUsernameCount2, lockedAccountCount2,
+                         loginCount3, wrongPasswordCount3, unknownUsernameCount3, lockedAccountCount3);
 }
 
 void processLoginAttempt(int loginCount, int& successfulCount, int& wrongPasswordCount, int& unknownUsernameCount, int& lockedAccountCount)
@@ -94,40 +216,98 @@ void processLoginAttempt(int loginCount, int& successfulCount, int& wrongPasswor
     }
 }
 
-void displayAnalysisResult(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+void printAnalysisResult(int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
 {   
-    double successPercent{}, failurePercent{};
-    std::string commonFailure{}, securityStatus{}, temporaryBlock{};
-    analyzeLoginAttempt(loginCount, successfulCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount, successPercent, failurePercent, commonFailure, securityStatus, temporaryBlock);
+    int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
+    double successPercent = calculatePercent(successfulCount, loginCount);
+    double failurePercent = calculatePercent(totalFailure, loginCount);
+    std::string commonFailure = determineCommonFailure (wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    std::string securityStatus = determineSecurityStatus(failurePercent);
+    std::string temporaryBlock = determineTemporaryBlock(lockedAccountCount, failurePercent);
+
     std::cout << "\n============ Analysis Result ============\n";
     std::cout << "Totals\n";
     std::cout << "  Successful Logins : " << successfulCount << '\n';
     std::cout << "  Wrong Passwords   : " << wrongPasswordCount << '\n';
     std::cout << "  Unknown Usernames : " << unknownUsernameCount << '\n';
     std::cout << "  Locked Accounts   : " << lockedAccountCount << '\n';
-
     std::cout << "\nPercentages\n";
     std::cout << "  Success Logins : " << successPercent << "%\n";
     std::cout << "  Failure Logins : " << failurePercent << "%\n";
-
     std::cout << "\nMost Common Failure : " << commonFailure << '\n';
     std::cout << "Security Status     : " << securityStatus << '\n';
     std::cout << "Temporary Block     : " << temporaryBlock << '\n';
-
+    std::cout << "=========================================\n";
     std::cout << "\nReturning to Main Menu...\n";
 }
 
-void analyzeLoginAttempt( int loginCount, int successfulCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount, 
-                                double& successPercent, double& failurePercent,
-                                std::string& commonFailure, std::string& securityStatus, std::string& temporaryBlock)
+void runAlertSummary(bool analyzedLoginAttempt, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+{   
+    if (!analyzedLoginAttempt)
+    {
+        std::cout << "\nNo login analysis has been performed yet.\n";
+        return;
+    }
+    printRecentAnalysis(loginCount, wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+}
+
+void printRecentAnalysis(int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
 {
     int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
-    successPercent = calculatePercent(successfulCount, loginCount);
-    failurePercent = calculatePercent(totalFailure, loginCount);
-    commonFailure = determineCommonFailure (wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
-    securityStatus = determineSecurityStatus(failurePercent);
-    temporaryBlock = determineTemporaryBlock(lockedAccountCount, failurePercent);
+    double failurePercent = calculatePercent(totalFailure, loginCount);
+    std::string commonFailure = determineCommonFailure (wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    std::string securityStatus = determineSecurityStatus(failurePercent);
+    std::string temporaryBlock = determineTemporaryBlock(lockedAccountCount, failurePercent);
+    
+    std::cout << "\n====== Recent Login Analysis Report ======\n";
+    std::cout << "Most Common Failure : " << commonFailure << '\n';
+    std::cout << "Security Status     : " << securityStatus << '\n';
+    std::cout << "Temporary Block     : " << temporaryBlock << '\n';
+    std::cout << "==========================================\n";
+    std::cout << "\nReturning to Main Menu...\n";
 }
+
+void printSingleHistory(int analysisNum, int loginCount, int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
+{   
+    int totalFailure = wrongPasswordCount + unknownUsernameCount + lockedAccountCount;
+    double failurePercent = calculatePercent(totalFailure, loginCount);
+    std::string commonFailure = determineCommonFailure (wrongPasswordCount, unknownUsernameCount, lockedAccountCount);
+    std::string securityStatus = determineSecurityStatus(failurePercent);
+    std::string temporaryBlock = determineTemporaryBlock(lockedAccountCount, failurePercent);
+
+    std::cout << "\nAnalysis #" << analysisNum << '\n';
+    std::cout << "  Total Attempts      : " << loginCount << '\n';
+    std::cout << "  Wrong Passwords     : " << wrongPasswordCount << '\n';
+    std::cout << "  Unknown Usernames   : " << unknownUsernameCount << '\n';
+    std::cout << "  Locked Accounts     : " << lockedAccountCount << '\n';
+    std::cout << "  Most Common Failure : " << commonFailure << '\n';
+    std::cout << "  Security Status     : " << securityStatus << '\n';
+    std::cout << "  Temporary Block     : " << temporaryBlock << '\n';
+    std::cout << "======================================\n"; 
+    std::cout << "\nReturning to Main Menu...\n"; 
+}
+
+void runAnalysisHistory(int historyCount,
+                        int loginCount1, int wrongPasswordCount1, int unknownUsernameCount1, int lockedAccountCount1,
+                        int loginCount2, int wrongPasswordCount2, int unknownUsernameCount2, int lockedAccountCount2,
+                        int loginCount3, int wrongPasswordCount3, int unknownUsernameCount3, int lockedAccountCount3)
+{
+    if (historyCount == 0)
+    {
+        std::cout << "\nNo login analysis has been performed yet.\n";
+        return;
+    }
+    std::cout << "\n========== Analysis History ==========";
+    if (historyCount >= 1) printSingleHistory(1, loginCount1, wrongPasswordCount1, unknownUsernameCount1, lockedAccountCount1);
+    if (historyCount >= 2) printSingleHistory(2, loginCount2, wrongPasswordCount2, unknownUsernameCount2, lockedAccountCount2);
+    if (historyCount >= 3) printSingleHistory(3, loginCount3, wrongPasswordCount3, unknownUsernameCount3, lockedAccountCount3);
+    if (historyCount >= 3)
+    {
+        std::cout << "\n!!! Note: Analysis History Storage Full !!!\n";
+        return;
+    }
+}
+
 // ============ Core Logic ============
 std::string determineCommonFailure(int wrongPasswordCount, int unknownUsernameCount, int lockedAccountCount)
 {
